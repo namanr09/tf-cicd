@@ -59,5 +59,10 @@ resource "aws_lambda_function" "this" {
   }
 
   tags       = var.tags
-  depends_on = [aws_cloudwatch_log_group.this]
+  depends_on = [aws_cloudwatch_log_group.this, time_sleep.role_propagation]
+}
+
+resource "time_sleep" "role_propagation" {
+  depends_on      = [aws_iam_role.this, aws_iam_role_policy_attachment.basic]
+  create_duration = "10s"
 }
