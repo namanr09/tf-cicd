@@ -2,7 +2,7 @@ name: CD
 
 on:
   push:
-    branches: [main]   # i.e. after a PR merges
+    branches: [main]
 
 permissions:
   id-token: write
@@ -12,24 +12,55 @@ jobs:
   deploy-dev:
     name: Deploy to dev
     runs-on: ubuntu-latest
-    environment: dev    # ties to a GitHub Environment (no approval needed for dev)
+    environment: dev
     steps:
       - uses: actions/checkout@v4
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
-
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: "1.9.0"
-
-      - name: Terraform Init
-        run: terraform init
+      - run: terraform init
+        working-directory: environments/dev
+      - run: terraform apply -auto-approve
         working-directory: environments/dev
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: environments/dev
+  deploy-uat:
+    name: Deploy to uat
+    needs: deploy-dev          # only after dev succeeds
+    runs-on: ubuntu-latest
+    environment: uat           # ← pauses here for approval
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+      - run: terraform init
+        working-directory: environments/uat
+      - run: terraform apply -auto-approve
+        working-directory: environments/uat
+
+  deploy-prod:
+    name: Deploy to prod
+    needs: deploy-uat          # only after uat succeeds
+    runs-on: ubuntu-latest
+    environment: prod          # ← pauses here for approval
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+      - run: terraform init
+        working-directory: environments/prod
+      - run: terraform apply -auto-approve
+        working-directory: environments/prod
