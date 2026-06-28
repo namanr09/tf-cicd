@@ -1,0 +1,15 @@
+# Local Terraform working files (downloaded providers, cache)
+.terraform/
+.terraform.tfstate.lock.info
+
+# State files — NEVER commit these. They can contain secrets and live remotely (S3) in real setups
+*.tfstate
+*.tfstate.*
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Secret variable files (we'll commit our NON-secret tfvars, but ignore "*.secret.tfvars")
+*.secret.tfvars
+secrets.auto.tfvars
