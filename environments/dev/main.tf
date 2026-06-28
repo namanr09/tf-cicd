@@ -32,7 +32,8 @@ module "ingest_fn" {
     BUCKET_NAME = module.data_bucket.bucket_id
   }
 
-  additional_policy_json = data.aws_iam_policy_document.ingest_permissions.json
+  additional_policy_json   = data.aws_iam_policy_document.ingest_permissions.json
+  attach_additional_policy = true
 }
 
 output "ingest_function_name" {

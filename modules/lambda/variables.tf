@@ -54,3 +54,9 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+
+variable "attach_additional_policy" {
+  description = "Whether to attach the additional IAM policy"
+  type        = bool
+  default     = false
+}
