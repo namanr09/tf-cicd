@@ -1,0 +1,35 @@
+name: CD
+
+on:
+  push:
+    branches: [main]   # i.e. after a PR merges
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-dev:
+    name: Deploy to dev
+    runs-on: ubuntu-latest
+    environment: dev    # ties to a GitHub Environment (no approval needed for dev)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.0"
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: environments/dev
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: environments/dev
