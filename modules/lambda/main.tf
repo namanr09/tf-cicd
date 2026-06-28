@@ -30,7 +30,7 @@ resource "aws_iam_role_policy_attachment" "basic" {
 
 # Optional: extra permissions (e.g. write to S3 / put to Firehose)
 resource "aws_iam_role_policy" "additional" {
-  count  = var.additional_policy_json == null ? 0 : 1
+  count  = var.attach_additional_policy ? 1 : 0
   name   = "${var.function_name}-additional"
   role   = aws_iam_role.this.id
   policy = var.additional_policy_json

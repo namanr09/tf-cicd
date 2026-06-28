@@ -38,3 +38,10 @@ module "ingest_fn" {
 output "ingest_function_name" {
   value = module.ingest_fn.function_name
 }
+
+module "ingest_fn" {
+  source = "../../modules/lambda"
+  # ...existing args...
+  additional_policy_json   = data.aws_iam_policy_document.ingest_permissions.json
+  attach_additional_policy = true
+}
