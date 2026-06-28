@@ -13,3 +13,6 @@ crash.*.log
 # Secret variable files (we'll commit our NON-secret tfvars, but ignore "*.secret.tfvars")
 *.secret.tfvars
 secrets.auto.tfvars
+
+# Lambda zip build artifacts
+.build/
